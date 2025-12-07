@@ -4,6 +4,8 @@ import express, { Request, Response } from "express"
 import { initDB } from "./database/db";
 import { userRoute } from "./modules/users/user.route";
 import { authRoute } from "./modules/auth/auth.route";
+import { adminRoute } from "./modules/adminOnly/admin.route";
+import auth from "./middleware/auth";
 
 
 const app = express()
@@ -15,6 +17,7 @@ initDB()
 
 app.use('/api/v1/auth',userRoute)
 app.use('/api/v1/auth',authRoute)
+app.use('/api/v1', auth(),adminRoute)
 
 app.get('/',(req:Request,res:Response)=>{
     res.status(200).json({
