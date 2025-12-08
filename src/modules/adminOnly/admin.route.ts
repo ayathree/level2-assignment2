@@ -10,5 +10,7 @@ const router =Router()
 
 
 router.get('/users',auth(Roles.admin), adminController.getAllUser)
+// router.get('/users/:userId',auth(Roles.admin), adminController.getSingleUserForAD)
+router.put("/users/:userId",auth(Roles.admin), adminController.updateSingleUserByAD)
 
 export const adminRoute = router
