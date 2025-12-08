@@ -44,6 +44,33 @@ const getAllVehicles = async(req:Request,res:Response)=>{
     
 
 }
+
+const getSingleVehicle= async(req:Request,res:Response)=>{
+    // console.log(req.params.id);
+   try {
+    const result =await  vehicleServices.getSingleVehiclesFromDBForAD(req.params.vehicleId as string)
+    if(result.rows.length===0){
+        res.status(404).json({
+        success:false,
+        message:"Vehicle not found",
+        })
+    }
+    else{
+        res.status(200).json({
+             success:true,
+        message:"Vehicle retrieved successfully",
+        data:result.rows[0]
+        })
+    }
+    
+   } catch (error:any) {
+    res.status(500).json({
+        success:false,
+        message:error.message,
+    })
+    
+   }
+}
 export const vehicleControllers={
-    createVehicles,getAllVehicles
+    createVehicles,getAllVehicles,getSingleVehicle
 }
