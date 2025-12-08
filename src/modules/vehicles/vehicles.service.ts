@@ -44,8 +44,13 @@ return result
 const updateSingleVehicleByAD=async(vehicle_name:string,type:string,registration_number:string,daily_rent_price:number,availability_status:string,vehicleId:string)=>{
     const result =await pool.query(`UPDATE vehicles SET vehicle_name=$1,type=$2,registration_number=$3,daily_rent_price=$4,availability_status=$5 WHERE id=$6 RETURNING id,vehicle_name,type,registration_number,daily_rent_price,availability_status`, [vehicle_name,type,registration_number,daily_rent_price,availability_status,vehicleId]);
     return result;
+};
+
+const deleteSingleVehicleByAD=async(vehicleId:string)=>{
+    const result =  await pool.query(`DELETE FROM vehicles WHERE id = $1`, [vehicleId]);
+    return result
 }
 
 export const vehicleServices={
-    createVehicleIntoDB,getAllVehiclesFromDB,getSingleVehiclesFromDBForAD,updateSingleVehicleByAD
+    createVehicleIntoDB,getAllVehiclesFromDB,getSingleVehiclesFromDBForAD,updateSingleVehicleByAD,deleteSingleVehicleByAD
 }
