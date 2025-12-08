@@ -7,6 +7,7 @@ import { authRoute } from "./modules/auth/auth.route";
 import { adminRoute } from "./modules/adminOnly/admin.route";
 import auth from "./middleware/auth";
 import { vehicleRoute } from "./modules/vehicles/vehicles.router";
+import { bookingRoute } from "./modules/bookings/bookings.route";
 
 
 const app = express()
@@ -20,7 +21,7 @@ app.use('/api/v1/auth',userRoute)
 app.use('/api/v1/auth',authRoute)
 app.use('/api/v1',adminRoute)
 app.use('/api/v1',vehicleRoute)
-
+app.use('/api/v1',bookingRoute)
 app.get('/',(req:Request,res:Response)=>{
     res.status(200).json({
         message:"this is the root route",
