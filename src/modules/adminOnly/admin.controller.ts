@@ -67,6 +67,33 @@ const updateSingleUserByAD = async(req:Request,res:Response)=>{
    }
 }
 
+const deleteSingleUserByAD = async(req:Request,res:Response)=>{
+    // console.log(req.params.id);
+   try {
+    const result = await adminServices.deleteUserByAD(req.params.userId as string)
+    if(result.rowCount===0){
+        res.status(404).json({
+        success:false,
+        message:"User not found",
+        })
+    }
+    else{
+        res.status(200).json({
+             success:true,
+        message:"User deleted successfully",
+        
+        })
+    }
+    
+   } catch (error:any) {
+    res.status(500).json({
+        success:false,
+        message:error.message,
+    })
+    
+   }
+}
+
 export const adminController={
-    getAllUser,updateSingleUserByAD
+    getAllUser,updateSingleUserByAD,deleteSingleUserByAD
 }

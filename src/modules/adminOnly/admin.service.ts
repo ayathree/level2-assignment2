@@ -126,6 +126,11 @@ const updateUser = async (
     },
   };
 };
+
+const deleteUserByAD=async(userId:string)=>{
+    const result =  await pool.query(`DELETE FROM users WHERE id = $1`, [userId]);
+    return result
+}
 export const adminServices={
-getAllUserFromDB,updateUser
+getAllUserFromDB,updateUser,deleteUserByAD
 }
