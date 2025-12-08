@@ -35,7 +35,7 @@ const auth = (...roles:string[])=>{
     }
     
     const user = await pool.query(
-        `SELECT * FROM users WHERE email=$1`,[decoded.email]
+        `SELECT * FROM users WHERE id=$1`,[decoded.id]
     );
     if(user.rows.length===0){
           return res.status(404).json({

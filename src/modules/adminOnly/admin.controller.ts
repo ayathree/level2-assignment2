@@ -51,23 +51,12 @@ const getAllUser = async(req:Request,res:Response)=>{
 // }
 
 const updateSingleUserByAD = async(req:Request,res:Response)=>{
-    // console.log(req.params.id);
+    
+     const { userId } = req.params;
     const {name,email,phone,role}=req.body;
    try {
-    const result = await adminServices.updateSingleUserByAD(name,email,phone,role,req.params.userId as string)
-    if(result.rows.length===0){
-        res.status(404).json({
-        success:false,
-        message:"User not found",
-        })
-    }
-    else{
-        res.status(200).json({
-             success:true,
-        message:"User updated successfully",
-        data:result.rows[0]
-        })
-    }
+    const result = await adminServices.updateUser(name, email, phone, role, userId as string, req.user)
+  return res.status(result.status).json(result.response);
     
    } catch (error:any) {
     res.status(500).json({
