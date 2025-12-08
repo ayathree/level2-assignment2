@@ -41,6 +41,18 @@ const createVehicleIntoDB = async (payLoad: Record<string, unknown>) => {
   return vehicle;
 };
 
+const getAllVehiclesFromDB = async () => {
+  
+  const result = await pool.query(
+    `
+    SELECT * FROM vehicles
+  `,
+   
+  );
+
+  return result;
+};
+
 export const vehicleServices={
-    createVehicleIntoDB
+    createVehicleIntoDB,getAllVehiclesFromDB
 }

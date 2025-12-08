@@ -9,7 +9,8 @@ import { Roles } from "../auth/auth.constant";
 
 const router =Router()
 
-router.post('/vehicles',auth(Roles.admin),vehicleControllers.createUser)
+router.post('/vehicles',auth(Roles.admin),vehicleControllers.createVehicles)
+router.get('/vehicles', vehicleControllers.getAllVehicles)
 
 
 

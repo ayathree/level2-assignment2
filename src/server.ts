@@ -18,7 +18,7 @@ initDB()
 
 app.use('/api/v1/auth',userRoute)
 app.use('/api/v1/auth',authRoute)
-app.use('/api/v1', auth(),adminRoute)
+app.use('/api/v1',adminRoute)
 app.use('/api/v1',vehicleRoute)
 
 app.get('/',(req:Request,res:Response)=>{
