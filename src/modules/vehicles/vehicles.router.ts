@@ -12,6 +12,7 @@ const router =Router()
 router.post('/vehicles',auth(Roles.admin),vehicleControllers.createVehicles)
 router.get('/vehicles', vehicleControllers.getAllVehicles)
 router.get('/vehicles/:vehicleId', vehicleControllers.getSingleVehicle)
+router.put('/vehicles/:vehicleId',auth(Roles.admin), vehicleControllers.updateSingleVehicle)
 
 
 
