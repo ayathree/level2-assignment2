@@ -68,7 +68,7 @@ const updateSingleUserByAD = async(req:Request,res:Response)=>{
 }
 
 const deleteSingleUserByAD = async(req:Request,res:Response)=>{
-    // console.log(req.params.id);
+   
    try {
     const result = await adminServices.deleteUserByAD(req.params.userId as string)
     if(result.rowCount===0){
