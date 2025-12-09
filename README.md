@@ -2,7 +2,7 @@
 
 ## Live URL
 
-[Check out the live application](https://level2-assignment2-ten.vercel.app)
+[Live URL](https://level2-assignment2-ten.vercel.app)
 
 
 ##  Features
