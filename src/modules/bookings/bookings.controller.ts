@@ -94,6 +94,68 @@ const getAllBookings = async (req: Request, res: Response) => {
   }
 };
 
+const updateBookingStatus = async (req: Request, res: Response) => {
+  try {
+    const { bookingId } = req.params;
+    const { status } = req.body;
+    const loggedInUser = req.user;
+    
+    // Validate booking ID
+    if (!bookingId || isNaN(Number(bookingId))) {
+      return res.status(400).json({
+        success: false,
+        message: "Valid booking ID is required"
+      });
+    }
+    
+    // Validate status
+    if (!status || (status !== 'cancelled' && status !== 'returned')) {
+      return res.status(400).json({
+        success: false,
+        message: "Status must be either 'cancelled' or 'returned'"
+      });
+    }
+    
+    // Call service to update booking status
+    const updatedBooking = await bookingService.updateBookingStatus(
+      bookingId, 
+      status, 
+      loggedInUser
+    );
+    
+    // Custom messages based on status
+    let message = "";
+    if (status === 'cancelled') {
+      message = "Booking cancelled successfully";
+    } else if (status === 'returned') {
+      message = "Booking marked as returned. Vehicle is now available";
+    }
+    
+    return res.status(200).json({
+      success: true,
+      message,
+      data: updatedBooking
+    });
+    
+  } catch (error: any) {
+    console.error('Update booking status error:', error);
+    
+    // Handle specific errors
+    if (error.status === 400 || error.status === 403 || error.status === 404) {
+      return res.status(error.status).json({
+        success: false,
+        message: error.message
+      });
+    }
+    
+    // Generic error
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Failed to update booking status"
+    });
+  }
+};
+
 export const bookingController={
-    createBooking,getAllBookings
+    createBooking,getAllBookings,updateBookingStatus
 }

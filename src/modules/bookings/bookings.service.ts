@@ -151,7 +151,120 @@ const getAllBookingsFromDB = async (loggedInUser: any) => {
   throw new Error("Invalid user role");
 };
 
+const updateBookingStatus = async (bookingId: string, status: string, loggedInUser: any) => {
+  // 1. Get the booking details first
+  const bookingResult = await pool.query(
+    `SELECT * FROM bookings WHERE id = $1`,
+    [bookingId]
+  );
+  
+  if (bookingResult.rows.length === 0) {
+    throw { status: 404, message: "Booking not found" };
+  }
+  
+  const booking = bookingResult.rows[0];
+  
+  // 2. Customer: Cancel booking (before start date only)
+  if (loggedInUser.role === "customer") {
+    // Customer can only cancel their own bookings
+    if (booking.customer_id !== loggedInUser.id) {
+      throw { 
+        status: 403, 
+        message: "You can only cancel your own bookings" 
+      };
+    }
+    
+    // Customer can only set status to 'cancelled'
+    if (status !== 'cancelled') {
+      throw { 
+        status: 400, 
+        message: "Customers can only cancel bookings" 
+      };
+    }
+    
+    // Check if booking is already cancelled
+    if (booking.status === 'cancelled') {
+      throw { status: 400, message: "Booking is already cancelled" };
+    }
+    
+    // Check if booking can be cancelled (before start date)
+    const rentStartDate = new Date(booking.rent_start_date);
+    const now = new Date();
+    
+    if (rentStartDate <= now) {
+      throw { 
+        status: 400, 
+        message: "Cannot cancel booking after start date" 
+      };
+    }
+  }
+  
+  // 3. Admin: Can only mark ANY booking as 'returned'
+  if (loggedInUser.role === "admin") {
+    // Admin can ONLY set status to 'returned' (NOT 'cancelled')
+    if (status !== 'returned') {
+      throw { 
+        status: 400, 
+        message: "Admin can only mark bookings as returned" 
+      };
+    }
+    
+    // Check if booking is already returned
+    if (booking.status === 'returned') {
+      throw { status: 400, message: "Booking is already returned" };
+    }
+    
+    // Admin can only mark active bookings as returned
+    if (booking.status !== 'active') {
+      throw { 
+        status: 400, 
+        message: "Can only mark active bookings as returned" 
+      };
+    }
+  }
+  
+  // 4. Update booking status
+  const updateResult = await pool.query(
+    `UPDATE bookings 
+     SET status = $1, updated_at = CURRENT_TIMESTAMP
+     WHERE id = $2
+     RETURNING id, customer_id, vehicle_id, rent_start_date, rent_end_date, total_price, status`,
+    [status, bookingId]
+  );
+  
+  // 5. Update vehicle availability (both cancelled and returned set to 'available')
+  if (status === 'cancelled' || status === 'returned') {
+    await pool.query(
+      `UPDATE vehicles 
+       SET availability_status = 'available' 
+       WHERE id = $1`,
+      [booking.vehicle_id]
+    );
+  }
+  
+  // 6. Get vehicle status for admin response
+  let vehicleInfo = null;
+  if (loggedInUser.role === "admin" && status === 'returned') {
+    const vehicleResult = await pool.query(
+      `SELECT availability_status FROM vehicles WHERE id = $1`,
+      [booking.vehicle_id]
+    );
+    vehicleInfo = vehicleResult.rows[0];
+  }
+  
+  const responseData = updateResult.rows[0];
+  
+  // Add vehicle info for admin returned response
+  if (vehicleInfo) {
+    responseData.vehicle = {
+      availability_status: vehicleInfo.availability_status
+    };
+  }
+  
+  return responseData;
+};
+
 export const bookingService={
-    createBookingIntoDB,getAllBookingsFromDB,
+    createBookingIntoDB,getAllBookingsFromDB,updateBookingStatus
   
 }
