@@ -127,10 +127,30 @@ const updateUser = async (
   };
 };
 
-const deleteUserByAD=async(userId:string)=>{
-    const result =  await pool.query(`DELETE FROM users WHERE id = $1`, [userId]);
-    return result
-}
+const deleteUserByAD = async (userId: string) => {
+  // 1. Check if user has active bookings (SIMPLEST CHECK)
+  const check = await pool.query(
+    `SELECT id FROM bookings WHERE customer_id = $1 AND status = 'active'`,
+    [userId]
+  );
+  
+  // If any rows returned, user has active bookings
+  if (check.rows.length > 0) {
+    throw { 
+      status: 400, 
+      message: "Cannot delete user with active bookings" 
+    };
+  }
+  
+  // 2. Delete user (if no active bookings)
+  const result = await pool.query(
+    `DELETE FROM users WHERE id = $1`,
+    [userId]
+  );
+  
+ 
+  return result;
+};
 export const adminServices={
 getAllUserFromDB,updateUser,deleteUserByAD
 }
