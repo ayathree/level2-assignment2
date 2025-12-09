@@ -11,15 +11,19 @@
 - User Registration & Login (JWT-based)
 - Role-based Access Control (Admin, Customer)
 - Secure Password Hashing (bcrypt)
+
 **Vehicle Management**:
 - Add, View, Update, Delete Vehicles
 - Vehicle Availability Tracking
-- **Booking System**:
+
+**Booking System**:
 - Create, View, Update, Cancel Bookings
 - Automatic Price Calculation (Daily Rate × Days)
-- **User Management**: 
+
+**User Management**: 
 - User Deletion with Active Booking Check
-- **Admin Features**
+
+**Admin Features**
 - View All Bookings & Users
 -  Mark Bookings as Returned
 - Manage Vehicles & Users
