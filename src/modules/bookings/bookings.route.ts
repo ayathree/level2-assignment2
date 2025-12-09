@@ -11,6 +11,7 @@ import { bookingController } from "./bookings.controller";
 const router =Router()
 
 router.post('/bookings',auth(Roles.admin,Roles.customer),bookingController.createBooking)
+router.get('/bookings',auth(Roles.admin,Roles.customer),bookingController.getAllBookings)
 
 
 

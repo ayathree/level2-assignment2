@@ -47,6 +47,111 @@ const createBookingIntoDB = async (payload: any) => {
   };
 };
 
+const getAllBookingsFromDB = async (loggedInUser: any) => {
+  if (loggedInUser.role === "admin") {
+    // 1. Get all bookings for admin
+    const bookingsResult = await pool.query(
+      `SELECT * FROM bookings ORDER BY created_at DESC`
+    );
+    
+    const bookings = bookingsResult.rows;
+    
+    // If no bookings, return empty array
+    if (bookings.length === 0) {
+      return [];
+    }
+    
+    const results = [];
+    
+    // 2. Add customer and vehicle details for each booking
+    for (const booking of bookings) {
+      // Get customer details
+      const customerResult = await pool.query(
+        `SELECT name, email FROM users WHERE id = $1`,
+        [booking.customer_id]
+      );
+      
+      // Get vehicle details
+      const vehicleResult = await pool.query(
+        `SELECT vehicle_name, registration_number FROM vehicles WHERE id = $1`,
+        [booking.vehicle_id]
+      );
+      
+      // Get customer data - check if exists
+      const customerData = customerResult.rows[0];
+      const vehicleData = vehicleResult.rows[0];
+      
+      results.push({
+        id: booking.id,
+        customer_id: booking.customer_id,
+        vehicle_id: booking.vehicle_id,
+        rent_start_date: booking.rent_start_date,
+        rent_end_date: booking.rent_end_date,
+        total_price: booking.total_price,
+        status: booking.status,
+        customer: {
+          name: customerData ? customerData.name : 'Unknown',
+          email: customerData ? customerData.email : 'Unknown'
+        },
+        vehicle: {
+          vehicle_name: vehicleData ? vehicleData.vehicle_name : 'Unknown',
+          registration_number: vehicleData ? vehicleData.registration_number : 'Unknown'
+        }
+      });
+    }
+    
+    return results;
+  }
+  
+  if (loggedInUser.role === "customer") {
+    // 1. Get customer's bookings only
+    const bookingsResult = await pool.query(
+      `SELECT * FROM bookings WHERE customer_id = $1 ORDER BY created_at DESC`,
+      [loggedInUser.id]
+    );
+    
+    const bookings = bookingsResult.rows;
+    
+    // If customer has no bookings, return empty array
+    if (bookings.length === 0) {
+      return [];
+    }
+    
+    const results = [];
+    
+    // 2. Add vehicle details for each booking
+    for (const booking of bookings) {
+      // Get vehicle details
+      const vehicleResult = await pool.query(
+        `SELECT vehicle_name, registration_number, type FROM vehicles WHERE id = $1`,
+        [booking.vehicle_id]
+      );
+      
+      // Get vehicle data - check if exists
+      const vehicleData = vehicleResult.rows[0];
+      
+      results.push({
+        id: booking.id,
+        vehicle_id: booking.vehicle_id,
+        rent_start_date: booking.rent_start_date,
+        rent_end_date: booking.rent_end_date,
+        total_price: booking.total_price,
+        status: booking.status,
+        vehicle: {
+          vehicle_name: vehicleData ? vehicleData.vehicle_name : 'Unknown',
+          registration_number: vehicleData ? vehicleData.registration_number : 'Unknown',
+          type: vehicleData ? vehicleData.type : 'Unknown'
+        }
+      });
+    }
+    
+    return results;
+  }
+  
+  throw new Error("Invalid user role");
+};
+
 export const bookingService={
-    createBookingIntoDB
+    createBookingIntoDB,getAllBookingsFromDB,
+  
 }

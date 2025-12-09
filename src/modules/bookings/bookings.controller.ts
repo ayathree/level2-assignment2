@@ -55,6 +55,45 @@ const createBooking = async (req: Request, res: Response) => {
    }
 };
 
+const getAllBookings = async (req: Request, res: Response) => {
+  try {
+    // Get user from request (set by auth middleware)
+    const loggedInUser = req.user;
+    
+    // Check if user is authenticated
+    if (!loggedInUser) {
+      return res.status(401).json({
+        success: false,
+        message: "Please login first"
+      });
+    }
+    
+    // Get bookings based on user role
+    const bookings = await bookingService.getAllBookingsFromDB(loggedInUser);
+    
+    // Different message for admin vs customer
+    const message = loggedInUser.role === 'admin' 
+      ? "Bookings retrieved successfully" 
+      : "Your bookings retrieved successfully";
+    
+    // Send response
+    return res.status(200).json({
+      success: true,
+      message,
+      data: bookings
+    });
+    
+  } catch (error: any) {
+    console.error('Error getting bookings:', error);
+    
+    // Send error response
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Failed to get bookings"
+    });
+  }
+};
+
 export const bookingController={
-    createBooking
+    createBooking,getAllBookings
 }
