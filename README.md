@@ -4,6 +4,10 @@
 
 [Live URL](https://level2-assignment2-ten.vercel.app)
 
+## Admin Credentials(if need, optional)
+- admin@email.com
+- 123456
+
 
 ##  Features
 
