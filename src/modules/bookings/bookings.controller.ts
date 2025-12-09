@@ -148,7 +148,7 @@ const updateBookingStatus = async (req: Request, res: Response) => {
       });
     }
     
-    // Generic error
+   
     return res.status(500).json({
       success: false,
       message: error.message || "Failed to update booking status"

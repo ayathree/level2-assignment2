@@ -55,7 +55,7 @@ const getAllVehicles = async(req:Request,res:Response)=>{
 }
 
 const getSingleVehicle= async(req:Request,res:Response)=>{
-    // console.log(req.params.id);
+    
    try {
     const result =await  vehicleServices.getSingleVehiclesFromDBForAD(req.params.vehicleId as string)
     if(result.rows.length===0){

@@ -30,7 +30,7 @@ const createBookingIntoDB = async (payload: any) => {
      payload.rent_end_date, totalPrice]
   );
   
-  // 4. Update vehicle (separate query - risk of inconsistency)
+ 
   await pool.query(
     `UPDATE vehicles SET availability_status = 'booked' WHERE id = $1`,
     [payload.vehicle_id]
